@@ -1,26 +1,17 @@
 import os
+import pandas as pd
 
 class UniqueInt:
     @staticmethod
     def process_file(input_file_path, output_file_path):
-        process_unique_integers = set()
+        # Read the input file into a Pandas DataFrame
+        df = pd.read_csv(input_file_path, header=None, names=["number"], dtype=int)
 
-        with open(input_file_path, 'r') as file:
-            for line in file:
-                line = line.strip()  # Remove any surrounding whitespace
-                if line:  # Skip empty lines
-                    try:
-                        number = int(line)
-                        process_unique_integers.add(number)
-                    except ValueError:
-                        # Line is not an integer, skip it
-                        pass
+        # Remove duplicates and sort the unique integers
+        unique_numbers = df["number"].drop_duplicates().sort_values()
 
-        sorted_unique_integers = sorted(process_unique_integers)
-
-        with open(output_file_path, 'w') as file:
-            for number in sorted_unique_integers:
-                file.write(f"{number}\n")
+        # Write the sorted unique integers to the output file
+        unique_numbers.to_csv(output_file_path, index=False, header=False)
 
 def main():
     input_dir = "../sample_inputs/"
@@ -30,12 +21,11 @@ def main():
         "small_sample_input_01.txt", "small_sample_input_02.txt", "small_sample_input_03.txt", "small_sample_input_04.txt"
     ]
 
-
     # Process each file
     for input_file in input_files:
         input_file_path = os.path.join(input_dir, input_file)
         output_file_path = os.path.join(output_dir, f"{input_file}_result.txt")
-        process_unique_integers(input_file_path, output_file_path)
+        UniqueInt.process_file(input_file_path, output_file_path)
         print(f"Processed {input_file} -> {output_file_path}")
 
 if __name__ == "__main__":
